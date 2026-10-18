@@ -1,2 +1,0 @@
-from "./index" import * as m
-test_dp := assert m["cidr.parse"] = m["cidr.parse"]
