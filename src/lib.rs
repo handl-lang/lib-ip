@@ -156,3 +156,12 @@ pub fn ip_handl_plugin() -> HandlLibraryPlugin {
 
 /// Legacy `LibraryPlugin` alias — delegates to [`IpLibraryPlugin`].
 pub type LibraryPlugin = IpLibraryPlugin;
+
+/// `.hnl` package source set — index + sibling files (wired into kits via
+/// `handl_module_from_sources`).
+pub const IP_FUNCS: &[&str] = &["parse","format","is_loopback","is_multicast","is_private","is_link_local","is_unspecified","cidr_parse","cidr_format","contains","network","broadcast"];
+pub const IP_SOURCES: &[(&str, &str, &[&str])] = &[
+    ("num", include_str!("internal/num.hnl"), &["dec_int","int_dec"]),
+    ("ipv4", include_str!("ipv4.hnl"), &["parse","format","is_unspecified","is_loopback","is_multicast","is_link_local","is_private"]),
+    ("cidr", include_str!("cidr.hnl"), &["cidr_parse","cidr_format","contains","network","broadcast"]),
+];
