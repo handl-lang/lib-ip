@@ -1,0 +1,38 @@
+--- `ip.*` — pure-Handl IPv4 address ops (u32 int as the value rep).
+from "./internal/num.hnl" import dec_int
+from "./internal/num.hnl" import int_dec
+
+export parse := (s) ~> do {
+  parts := str.split(s, ".")
+  a := -1
+  b := 0
+  c := 0
+  d := 0
+  i := 0
+  ok := true
+  for p in parts { do {
+    if dec_int(p) > 255 { do { ok := false } } else { do {} }
+    if i == 0 { do { a := dec_int(p) } } else {
+      if i == 1 { do { b := dec_int(p) } } else {
+        if i == 2 { do { c := dec_int(p) } } else { do { d := dec_int(p) } }
+      }
+    }
+    i := i + 1
+  } }
+  if ok && i == 4 { do {
+    math.bit_or(math.bit_or(math.shl(a, 24), math.shl(b, 16)), math.bit_or(math.shl(c, 8), d))
+  } } else { throw "ip.parse: invalid IPv4" }
+}
+
+export format := (v) ~> do {
+  int_dec(math.shr(v, 24)) + "." + int_dec(math.bit_and(math.shr(v, 16), 255))
+    + "." + int_dec(math.bit_and(math.shr(v, 8), 255)) + "." + int_dec(math.bit_and(v, 255))
+}
+
+export is_unspecified := (v) ~> v == 0
+export is_loopback := (v) ~> math.shr(v, 24) == 127
+export is_multicast := (v) ~> math.shr(v, 28) == 14
+export is_link_local := (v) ~> math.shr(v, 16) == 43518
+export is_private := (v) ~> do {
+  math.shr(v, 24) == 10 || math.shr(v, 20) == 2753 || math.shr(v, 16) == 49320
+}

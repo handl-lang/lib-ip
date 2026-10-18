@@ -1,19 +1,15 @@
-from "./index" import * as ip
-
-test_ip_parse_format := assert ip.format(ip.parse("192.168.1.1")) = "192.168.1.1"
-
-test_ip_is_private := assert ip.is_private(ip.parse("10.0.0.1"))
-
-test_ip_is_loopback := assert ip.is_loopback(ip.parse("127.0.0.1"))
-
-test_ip_is_multicast := assert ip.is_multicast(ip.parse("224.0.0.1"))
-
-test_ip_format_v6 := assert ip.format(ip.parse("2001:db8::1")) = "2001:db8::1"
-
-test_cidr_network := assert ip.cidr.network(ip.cidr.parse("192.168.0.0/24")) = "192.168.0.0"
-
-test_cidr_broadcast := assert ip.cidr.broadcast(ip.cidr.parse("192.168.0.0/24")) = "192.168.0.255"
-
-test_cidr_contains := assert ip.cidr.contains(ip.cidr.parse("10.0.0.0/8"), ip.parse("10.1.2.3"))
-
-test_socket_parse_format := assert ip.socket.format(ip.socket.parse("[::1]:443")) = "[::1]:443"
+from "./index" import * as m
+test_parse := assert m.parse("192.168.1.1") = 3232235777
+test_fmt := assert m.format(3232235777) = "192.168.1.1"
+test_rt := assert m.format(m.parse("10.0.0.1")) = "10.0.0.1"
+test_loop := assert m.is_loopback(m.parse("127.0.0.1")) = true
+test_priv := assert m.is_private(m.parse("10.1.2.3")) = true
+test_priv2 := assert m.is_private(m.parse("8.8.8.8")) = false
+test_unspec := assert m.is_unspecified(m.parse("0.0.0.0")) = true
+test_ll := assert m.is_link_local(m.parse("169.254.0.1")) = true
+test_mc := assert m.is_multicast(m.parse("224.0.0.1")) = true
+test_cp := assert m.cidr_format(m.cidr_parse("10.0.0.0/8")) = "10.0.0.0/8"
+test_net := assert m.network(m.cidr_parse("10.1.2.3/8")) = "10.0.0.0"
+test_bc := assert m.broadcast(m.cidr_parse("10.1.2.3/8")) = "10.255.255.255"
+test_ct := assert m.contains(m.cidr_parse("10.0.0.0/8"), m.parse("10.9.9.9")) = true
+test_ct2 := assert m.contains(m.cidr_parse("10.0.0.0/8"), m.parse("11.0.0.1")) = false

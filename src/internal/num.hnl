@@ -1,0 +1,22 @@
+--- internal decimal helpers.
+export dec_int := (s) ~> do {
+  v := 0
+  for c in char.chars(s) { do {
+    d := str.find("0123456789", c)
+    if d >= 0 { do { v := v * 10 + d } } else { throw "dec_int: invalid digit" }
+  } }
+  v
+}
+export int_dec := (n) ~> do {
+  s := ""
+  v := n
+  if v == 0 { do { s := "0" } } else { do {
+    for _ in char.chars(str.repeat("x", 20)) { do {
+      if v > 0 { do {
+        s := char.at("0123456789", v % 10) + s
+        v := math.floor_div(v, 10)
+      } } else { do {} }
+    } }
+  } }
+  s
+}

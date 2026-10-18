@@ -69,3 +69,17 @@ handle "ip.cidr.network" with rust_ip_cidr_network
 handle "ip.cidr.broadcast" with rust_ip_cidr_broadcast
 handle "ip.socket.parse" with rust_ip_socket_parse
 handle "ip.socket.format" with rust_ip_socket_format
+
+--- pure-handl impls (IPv4 + CIDR; socket.* stays native):
+from "./ipv4.hnl" export parse
+from "./ipv4.hnl" export format
+from "./ipv4.hnl" export is_loopback
+from "./ipv4.hnl" export is_multicast
+from "./ipv4.hnl" export is_private
+from "./ipv4.hnl" export is_link_local
+from "./ipv4.hnl" export is_unspecified
+from "./cidr.hnl" export cidr_parse
+from "./cidr.hnl" export cidr_format
+from "./cidr.hnl" export contains
+from "./cidr.hnl" export network
+from "./cidr.hnl" export broadcast
