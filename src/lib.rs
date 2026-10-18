@@ -8,6 +8,11 @@
 //! stdlib → `lib-*` split (ADR-0128). The [`IpModule`] re-export is
 //! preserved for consumers that resolve the module through
 //! `kit-canonical`.
+//!
+//! The `IpLibraryPlugin` / `LibraryPlugin` shim is transitional: it is kept
+//! because `kit-canonical` still registers it directly; the stdlib package
+//! table now contributes [`IpModule`] instead.
+#![allow(dead_code)]
 
 use std::sync::Arc;
 
@@ -147,7 +152,7 @@ pub fn ip_handl_plugin() -> HandlLibraryPlugin {
 }
 
 /// Legacy `LibraryPlugin` alias — delegates to [`IpLibraryPlugin`].
-pub use IpLibraryPlugin as LibraryPlugin;
+pub type LibraryPlugin = IpLibraryPlugin;
 
     registry.register("ip.socket.format", Arc::new(SocketFormat));
     registry
