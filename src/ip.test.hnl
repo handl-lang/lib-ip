@@ -1,0 +1,19 @@
+from "./index" import * as ip
+
+test_ip_parse_format := assert ip.format(ip.parse("192.168.1.1")) = "192.168.1.1"
+
+test_ip_is_private := assert ip.is_private(ip.parse("10.0.0.1"))
+
+test_ip_is_loopback := assert ip.is_loopback(ip.parse("127.0.0.1"))
+
+test_ip_is_multicast := assert ip.is_multicast(ip.parse("224.0.0.1"))
+
+test_ip_format_v6 := assert ip.format(ip.parse("2001:db8::1")) = "2001:db8::1"
+
+test_cidr_network := assert ip.cidr.network(ip.cidr.parse("192.168.0.0/24")) = "192.168.0.0"
+
+test_cidr_broadcast := assert ip.cidr.broadcast(ip.cidr.parse("192.168.0.0/24")) = "192.168.0.255"
+
+test_cidr_contains := assert ip.cidr.contains(ip.cidr.parse("10.0.0.0/8"), ip.parse("10.1.2.3"))
+
+test_socket_parse_format := assert ip.socket.format(ip.socket.parse("[::1]:443")) = "[::1]:443"

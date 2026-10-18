@@ -1,0 +1,26 @@
+[package]
+name = "handl-lib-ip"
+version = "0.1.0"
+edition = "2024"
+description = "ip: IP address, CIDR, and socket primitives (Handl stdlib port, ADR-0128 split)."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/handl-lang/lib-ip"
+
+[dependencies]
+handl-platform = { git = "https://github.com/handl-lang/platform", branch = "main" }
+handl-plugin-lib-handl = { git = "https://github.com/handl-lang/platform", branch = "main" }
+serde_json = "1"
+
+# ADR-0128 §Resolution: platform comes from the sibling checkout for local
+# development; CI resolves the git source.
+[patch."https://github.com/handl-lang/platform"]
+handl-platform = { path = "../platform/crates/platform" }
+handl-plugin-lib-handl = { path = "../platform/crates/plugin-lib-handl" }
+
+# `plugin-lib-handl` (above) reaches these `.hnl`-only packages through the
+# platform workspace's git deps; point them at the sibling checkouts.
+[patch."https://github.com/handl-lang/lib-str-handl"]
+handl-lib-str-handl = { path = "../lib-str-handl" }
+
+[patch."https://github.com/handl-lang/lib-dedent"]
+handl-lib-dedent = { path = "../lib-dedent" }
