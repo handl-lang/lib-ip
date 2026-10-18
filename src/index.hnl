@@ -55,20 +55,20 @@ op "ip.socket.parse" : String -> Value
 op "ip.socket.format" : Value -> String
   guarantee: IsString(output)
 
-handle "ip.parse" with rust_ip_parse
-handle "ip.format" with rust_ip_format
-handle "ip.is_loopback" with rust_ip_is_loopback
-handle "ip.is_multicast" with rust_ip_is_multicast
-handle "ip.is_private" with rust_ip_is_private
-handle "ip.is_link_local" with rust_ip_is_link_local
-handle "ip.is_unspecified" with rust_ip_is_unspecified
-handle "ip.cidr.parse" with rust_ip_cidr_parse
-handle "ip.cidr.format" with rust_ip_cidr_format
-handle "ip.cidr.contains" with rust_ip_cidr_contains
-handle "ip.cidr.network" with rust_ip_cidr_network
-handle "ip.cidr.broadcast" with rust_ip_cidr_broadcast
-handle "ip.socket.parse" with rust_ip_socket_parse
-handle "ip.socket.format" with rust_ip_socket_format
+handle "ip.parse" with ip_parse
+handle "ip.format" with ip_format
+handle "ip.is_loopback" with ip_is_loopback
+handle "ip.is_multicast" with ip_is_multicast
+handle "ip.is_private" with ip_is_private
+handle "ip.is_link_local" with ip_is_link_local
+handle "ip.is_unspecified" with ip_is_unspecified
+handle "ip.cidr.parse" with ip_cidr_parse
+handle "ip.cidr.format" with ip_cidr_format
+handle "ip.cidr.contains" with ip_cidr_contains
+handle "ip.cidr.network" with ip_cidr_network
+handle "ip.cidr.broadcast" with ip_cidr_broadcast
+handle "ip.socket.parse" with ip_socket_parse
+handle "ip.socket.format" with ip_socket_format
 
 --- pure-handl impls (IPv4 + CIDR; socket.* stays native):
 from "./ipv4.hnl" export parse
@@ -83,3 +83,14 @@ from "./cidr.hnl" export cidr_format
 from "./cidr.hnl" export contains
 from "./cidr.hnl" export network
 from "./cidr.hnl" export broadcast
+--- nested module records so `ip.cidr.parse` / `ip.socket.parse` resolve via
+--- field access on the `ip` module record.
+--- dotted func keys so `ip.cidr.parse` resolves (first-dot module split →
+--- local name "cidr.parse").
+export "cidr.parse" := cidr_parse
+export "cidr.format" := cidr_format
+export "cidr.contains" := contains
+export "cidr.network" := network
+export "cidr.broadcast" := broadcast
+export "socket.parse" := socket_parse
+export "socket.format" := socket_format

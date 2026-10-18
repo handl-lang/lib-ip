@@ -1,0 +1,19 @@
+--- `ip.socket.*` — pure-Handl "ip:port" socket-address ops.
+from "./internal/num.hnl" import dec_int
+from "./internal/num.hnl" import int_dec
+from "./ipv4.hnl" import parse_int
+from "./ipv4.hnl" import format_int
+from "./ipv4.hnl" import int_of
+from "./ipv4.hnl" import parse
+
+export socket_parse := (s) ~> do {
+  i := str.rfind(s, ":")
+  if i < 0 { throw "ip.socket.parse: expected ip:port" } else { do {} }
+  ip_s := str.slice(s, 0, i)
+  port := dec_int(str.slice(s, i + 1, str.length(s)))
+  if port < 0 || port > 65535 { throw "ip.socket.parse: invalid port" } else { do {} }
+  { ip: parse(ip_s), port: port }
+}
+export socket_format := (v) ~> do {
+  if typeof.is(v, typeof.str()) { v } else { format_int(int_of(v.ip.address)) + ":" + int_dec(v.port) }
+}

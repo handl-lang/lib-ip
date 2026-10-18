@@ -1,30 +1,42 @@
---- `ip.cidr.*` — pure-Handl CIDR ops. Value rep: { addr: Int, len: Int }.
+--- `ip.cidr.*` — pure-Handl IPv4 CIDR ops over u32 int rep.
 from "./internal/num.hnl" import dec_int
 from "./internal/num.hnl" import int_dec
-from "./ipv4.hnl" import parse
-from "./ipv4.hnl" import format
+from "./ipv4.hnl" import parse_int
+from "./ipv4.hnl" import format_int
+from "./ipv4.hnl" import int_of
+
+--- normalize a cidr value (record or "a.b.c.d/n" string) to {addr, len}.
+raw_of := (v) ~> do {
+  if typeof.is(v, typeof.str()) { do {
+    parts := str.split(v, "/")
+    addr := 0
+    plen := -1
+    i := 0
+    for p in parts { do {
+      if i == 0 { do { addr := parse_int(p) } } else { do { plen := dec_int(p) } }
+      i := i + 1
+    } }
+    if i == 2 && plen >= 0 && plen <= 32 { do { { addr: addr, len: plen } } } else {
+      throw "ip.cidr.parse: invalid CIDR"
+    }
+  } } else { { addr: parse_int(v.address), len: v.prefix } }
+}
 
 export cidr_parse := (s) ~> do {
-  parts := str.split(s, "/")
-  addr := 0
-  plen := 0
-  i := 0
-  for p in parts { do {
-    if i == 0 { do { addr := parse(p) } } else { do { plen := dec_int(p) } }
-    i := i + 1
-  } }
-  if i == 2 && plen >= 0 && plen <= 32 { do { { addr: addr, len: plen } } } else {
-    throw "ip.cidr.parse: invalid CIDR"
-  }
+  r := raw_of(s)
+  { version: 4, address: format_int(r.addr), prefix: r.len }
 }
-
-export cidr_format := (v) ~> format(v.addr) + "/" + int_dec(v.len)
+export cidr_format := (v) ~> format_int(raw_of(v).addr) + "/" + int_dec(raw_of(v).len)
 
 shift := (plen) ~> math.shl(1, 32 - plen)
-net_of := (v) ~> v.addr - (v.addr % shift(v.len))
+net_of := (r) ~> r.addr - (r.addr % shift(r.len))
 
 export contains := (v, addr) ~> do {
-  math.shr(addr, 32 - v.len) == math.shr(v.addr, 32 - v.len)
+  r := raw_of(v)
+  math.shr(int_of(addr), 32 - r.len) == math.shr(r.addr, 32 - r.len)
 }
-export network := (v) ~> format(net_of(v))
-export broadcast := (v) ~> format(net_of(v) + shift(v.len) - 1)
+export network := (v) ~> format_int(net_of(raw_of(v)))
+export broadcast := (v) ~> do {
+  r := raw_of(v)
+  format_int(net_of(r) + shift(r.len) - 1)
+}

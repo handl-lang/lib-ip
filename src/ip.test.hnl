@@ -1,5 +1,5 @@
 from "./index" import * as m
-test_parse := assert m.parse("192.168.1.1") = 3232235777
+test_parse := assert m.parse("192.168.1.1").address = "192.168.1.1"
 test_fmt := assert m.format(3232235777) = "192.168.1.1"
 test_rt := assert m.format(m.parse("10.0.0.1")) = "10.0.0.1"
 test_loop := assert m.is_loopback(m.parse("127.0.0.1")) = true

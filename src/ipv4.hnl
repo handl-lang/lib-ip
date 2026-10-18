@@ -1,8 +1,8 @@
---- `ip.*` — pure-Handl IPv4 address ops (u32 int as the value rep).
+--- `ip.*` — pure-Handl IPv4 ops; the u32 int is the internal rep.
 from "./internal/num.hnl" import dec_int
 from "./internal/num.hnl" import int_dec
 
-export parse := (s) ~> do {
+export parse_int := (s) ~> do {
   parts := str.split(s, ".")
   a := -1
   b := 0
@@ -11,7 +11,7 @@ export parse := (s) ~> do {
   i := 0
   ok := true
   for p in parts { do {
-    if dec_int(p) > 255 { do { ok := false } } else { do {} }
+    if dec_int(p) > 255 || dec_int(p) < 0 { do { ok := false } } else { do {} }
     if i == 0 { do { a := dec_int(p) } } else {
       if i == 1 { do { b := dec_int(p) } } else {
         if i == 2 { do { c := dec_int(p) } } else { do { d := dec_int(p) } }
@@ -24,15 +24,40 @@ export parse := (s) ~> do {
   } } else { throw "ip.parse: invalid IPv4" }
 }
 
-export format := (v) ~> do {
+export format_int := (v) ~> do {
   int_dec(math.shr(v, 24)) + "." + int_dec(math.bit_and(math.shr(v, 16), 255))
     + "." + int_dec(math.bit_and(math.shr(v, 8), 255)) + "." + int_dec(math.bit_and(v, 255))
 }
 
-export is_unspecified := (v) ~> v == 0
-export is_loopback := (v) ~> math.shr(v, 24) == 127
-export is_multicast := (v) ~> math.shr(v, 28) == 14
-export is_link_local := (v) ~> math.shr(v, 16) == 43518
-export is_private := (v) ~> do {
+is_unspecified_int := (v) ~> v == 0
+is_loopback_int := (v) ~> math.shr(v, 24) == 127
+is_multicast_int := (v) ~> math.shr(v, 28) == 14
+is_link_local_int := (v) ~> math.shr(v, 16) == 43518
+is_private_int := (v) ~> do {
   math.shr(v, 24) == 10 || math.shr(v, 20) == 2753 || math.shr(v, 16) == 49320
 }
+
+--- normalize an ip value (int, dotted string, or parsed record) to u32.
+export int_of := (v) ~> do {
+  if typeof.is(v, typeof.num()) { v } else {
+    if typeof.is(v, typeof.str()) { parse_int(v) } else { parse_int(v.address) }
+  }
+}
+
+export parse := (s) ~> do {
+  v := parse_int(s)
+  { version: 4, address: s,
+    is_loopback: is_loopback_int(v), is_multicast: is_multicast_int(v),
+    is_private: is_private_int(v), is_link_local: is_link_local_int(v),
+    is_unspecified: is_unspecified_int(v) }
+}
+export format := (v) ~> do {
+  if typeof.is(v, typeof.str()) { v } else {
+    if typeof.is(v, typeof.num()) { format_int(v) } else { v.address }
+  }
+}
+export is_unspecified := (v) ~> is_unspecified_int(int_of(v))
+export is_loopback := (v) ~> is_loopback_int(int_of(v))
+export is_multicast := (v) ~> is_multicast_int(int_of(v))
+export is_link_local := (v) ~> is_link_local_int(int_of(v))
+export is_private := (v) ~> is_private_int(int_of(v))
