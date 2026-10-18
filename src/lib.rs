@@ -80,6 +80,9 @@ pub fn ip_op_registry() -> OpRegistry {
     registry.register("ip.cidr.network", Arc::new(CidrNetwork));
     registry.register("ip.cidr.broadcast", Arc::new(CidrBroadcast));
     registry.register("ip.socket.parse", Arc::new(SocketParse));
+    registry.register("ip.socket.format", Arc::new(SocketFormat));
+    registry
+}
 
 // ---------------------------------------------------------------------------
 // IpLibraryPlugin (wraps HandlLibraryPlugin with op registry)
@@ -153,7 +156,3 @@ pub fn ip_handl_plugin() -> HandlLibraryPlugin {
 
 /// Legacy `LibraryPlugin` alias — delegates to [`IpLibraryPlugin`].
 pub type LibraryPlugin = IpLibraryPlugin;
-
-    registry.register("ip.socket.format", Arc::new(SocketFormat));
-    registry
-}
