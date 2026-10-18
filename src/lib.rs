@@ -165,3 +165,6 @@ pub const IP_SOURCES: &[(&str, &str, &[&str])] = &[
     ("ipv4", include_str!("ipv4.hnl"), &["parse","format","is_unspecified","is_loopback","is_multicast","is_link_local","is_private"]),
     ("cidr", include_str!("cidr.hnl"), &["cidr_parse","cidr_format","contains","network","broadcast"]),
 ];
+
+/// Flattened single-source `.hnl` (for `stdlib::MODULES` table rows).
+pub const IP_FLAT_HNL: &str = include_str!("index_flat.hnl");

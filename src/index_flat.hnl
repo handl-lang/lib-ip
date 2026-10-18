@@ -1,0 +1,160 @@
+--- internal decimal helpers.
+dec_int := (s) ~> do {
+  v := 0
+  for c in char.chars(s) { do {
+    d := str.find("0123456789", c)
+    if d >= 0 { do { v := v * 10 + d } } else { throw "dec_int: invalid digit" }
+  } }
+  v
+}
+int_dec := (n) ~> do {
+  s := ""
+  v := n
+  if v == 0 { do { s := "0" } } else { do {
+    for _ in char.chars(str.repeat("x", 20)) { do {
+      if v > 0 { do {
+        s := char.at("0123456789", v % 10) + s
+        v := math.floor_div(v, 10)
+      } } else { do {} }
+    } }
+  } }
+  s
+}
+
+--- `ip.*` — pure-Handl IPv4 address ops (u32 int as the value rep).
+
+export parse := (s) ~> do {
+  parts := str.split(s, ".")
+  a := -1
+  b := 0
+  c := 0
+  d := 0
+  i := 0
+  ok := true
+  for p in parts { do {
+    if dec_int(p) > 255 { do { ok := false } } else { do {} }
+    if i == 0 { do { a := dec_int(p) } } else {
+      if i == 1 { do { b := dec_int(p) } } else {
+        if i == 2 { do { c := dec_int(p) } } else { do { d := dec_int(p) } }
+      }
+    }
+    i := i + 1
+  } }
+  if ok && i == 4 { do {
+    math.bit_or(math.bit_or(math.shl(a, 24), math.shl(b, 16)), math.bit_or(math.shl(c, 8), d))
+  } } else { throw "ip.parse: invalid IPv4" }
+}
+
+export format := (v) ~> do {
+  int_dec(math.shr(v, 24)) + "." + int_dec(math.bit_and(math.shr(v, 16), 255))
+    + "." + int_dec(math.bit_and(math.shr(v, 8), 255)) + "." + int_dec(math.bit_and(v, 255))
+}
+
+export is_unspecified := (v) ~> v == 0
+export is_loopback := (v) ~> math.shr(v, 24) == 127
+export is_multicast := (v) ~> math.shr(v, 28) == 14
+export is_link_local := (v) ~> math.shr(v, 16) == 43518
+export is_private := (v) ~> do {
+  math.shr(v, 24) == 10 || math.shr(v, 20) == 2753 || math.shr(v, 16) == 49320
+}
+
+--- `ip.cidr.*` — pure-Handl CIDR ops. Value rep: { addr: Int, len: Int }.
+
+export cidr_parse := (s) ~> do {
+  parts := str.split(s, "/")
+  addr := 0
+  plen := 0
+  i := 0
+  for p in parts { do {
+    if i == 0 { do { addr := parse(p) } } else { do { plen := dec_int(p) } }
+    i := i + 1
+  } }
+  if i == 2 && plen >= 0 && plen <= 32 { do { { addr: addr, len: plen } } } else {
+    throw "ip.cidr.parse: invalid CIDR"
+  }
+}
+
+export cidr_format := (v) ~> format(v.addr) + "/" + int_dec(v.len)
+
+shift := (plen) ~> math.shl(1, 32 - plen)
+net_of := (v) ~> v.addr - (v.addr % shift(v.len))
+
+export contains := (v, addr) ~> do {
+  math.shr(addr, 32 - v.len) == math.shr(v.addr, 32 - v.len)
+}
+export network := (v) ~> format(net_of(v))
+export broadcast := (v) ~> format(net_of(v) + shift(v.len) - 1)
+
+--- ip.parse -- parse an IP address string into an ip object.
+--- ip.format -- format an ip object (or string) into a canonical string.
+--- ip.is_loopback -- test whether an ip address is a loopback address.
+--- ip.is_multicast -- test whether an ip address is a multicast address.
+--- ip.is_private -- test whether an ip address is in a private range.
+--- ip.is_link_local -- test whether an ip address is link-local.
+--- ip.is_unspecified -- test whether an ip address is unspecified (0.0.0.0 / ::).
+--- ip.cidr.parse -- parse a CIDR string into a cidr object.
+--- ip.cidr.format -- format a cidr object (or string) into a canonical string.
+--- ip.cidr.contains -- test whether a cidr contains an ip address.
+--- ip.cidr.network -- return the network address of a cidr.
+--- ip.cidr.broadcast -- return the broadcast (last) address of a cidr.
+--- ip.socket.parse -- parse a socket address string into a socket object.
+--- ip.socket.format -- format a socket object (or string) into a canonical string.
+cap "ip.parse"
+cap "ip.format"
+cap "ip.is_loopback"
+cap "ip.is_multicast"
+cap "ip.is_private"
+cap "ip.is_link_local"
+cap "ip.is_unspecified"
+cap "ip.cidr.parse"
+cap "ip.cidr.format"
+cap "ip.cidr.contains"
+cap "ip.cidr.network"
+cap "ip.cidr.broadcast"
+cap "ip.socket.parse"
+cap "ip.socket.format"
+op "ip.parse" : String -> Value
+  guarantee: True
+op "ip.format" : Value -> String
+  guarantee: IsString(output)
+op "ip.is_loopback" : Value -> Bool
+  guarantee: True
+op "ip.is_multicast" : Value -> Bool
+  guarantee: True
+op "ip.is_private" : Value -> Bool
+  guarantee: True
+op "ip.is_link_local" : Value -> Bool
+  guarantee: True
+op "ip.is_unspecified" : Value -> Bool
+  guarantee: True
+op "ip.cidr.parse" : String -> Value
+  guarantee: True
+op "ip.cidr.format" : Value -> String
+  guarantee: IsString(output)
+op "ip.cidr.contains" : (Value, Value) -> Bool
+  guarantee: True
+op "ip.cidr.network" : Value -> String
+  guarantee: IsString(output)
+op "ip.cidr.broadcast" : Value -> String
+  guarantee: IsString(output)
+op "ip.socket.parse" : String -> Value
+  guarantee: True
+op "ip.socket.format" : Value -> String
+  guarantee: IsString(output)
+
+handle "ip.parse" with rust_ip_parse
+handle "ip.format" with rust_ip_format
+handle "ip.is_loopback" with rust_ip_is_loopback
+handle "ip.is_multicast" with rust_ip_is_multicast
+handle "ip.is_private" with rust_ip_is_private
+handle "ip.is_link_local" with rust_ip_is_link_local
+handle "ip.is_unspecified" with rust_ip_is_unspecified
+handle "ip.cidr.parse" with rust_ip_cidr_parse
+handle "ip.cidr.format" with rust_ip_cidr_format
+handle "ip.cidr.contains" with rust_ip_cidr_contains
+handle "ip.cidr.network" with rust_ip_cidr_network
+handle "ip.cidr.broadcast" with rust_ip_cidr_broadcast
+handle "ip.socket.parse" with rust_ip_socket_parse
+handle "ip.socket.format" with rust_ip_socket_format
+
+--- pure-handl impls (IPv4 + CIDR; socket.* stays native):
