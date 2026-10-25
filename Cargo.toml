@@ -14,9 +14,6 @@ serde_json = "1"
 # ADR-0128 §Resolution: platform comes from the sibling checkout for local
 # development; CI resolves the git source.
 
-[patch."https://github.com/handl-lang/lib-dedent"]
-handl-lib-dedent = { path = "../lib-dedent" }
-
 [patch."https://github.com/handl-lang/lib-str-handl"]
 handl-lib-str-handl = { path = "../lib-str-handl" }
 
