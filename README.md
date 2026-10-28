@@ -13,3 +13,7 @@ Part of the stdlib → `lib-*` split (ADR-0128); moved from
 - `src/module.rs` — the Rust handls (`IpParse`, `CidrParse`, …) and the
   aggregator `IpModule`.
 - `src/lib.rs` — `IP_HNL` / `IP_OPS` pins plus `ip_op_registry()`.
+
+## License
+
+MIT.
