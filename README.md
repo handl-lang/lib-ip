@@ -2,10 +2,6 @@
 
 `ip` — IP address, CIDR, and socket primitives (Handl stdlib port).
 
-Part of the stdlib → `lib-*` split (ADR-0128); moved from
-`stdlib/crates/plugin-lib-stdlib/src/ops/ip/` and
-`stdlib/handl-packages/ip/`.
-
 - `src/index.hnl` — the interface: `op` declarations for `ip.*`,
   `ip.cidr.*`, and `ip.socket.*`.
 - `src/addr.rs`, `src/cidr.rs`, `src/socket.rs`, `src/error.rs` — the
