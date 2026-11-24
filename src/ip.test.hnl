@@ -1,15 +1,15 @@
 from "./index" import * as m
-test_parse := assert m.parse("192.168.1.1").address = "192.168.1.1"
-test_fmt := assert m.format(3232235777) = "192.168.1.1"
-test_rt := assert m.format(m.parse("10.0.0.1")) = "10.0.0.1"
-test_loop := assert m.is_loopback(m.parse("127.0.0.1")) = true
-test_priv := assert m.is_private(m.parse("10.1.2.3")) = true
-test_priv2 := assert m.is_private(m.parse("8.8.8.8")) = false
-test_unspec := assert m.is_unspecified(m.parse("0.0.0.0")) = true
-test_ll := assert m.is_link_local(m.parse("169.254.0.1")) = true
-test_mc := assert m.is_multicast(m.parse("224.0.0.1")) = true
-test_cp := assert m.cidr_format(m.cidr_parse("10.0.0.0/8")) = "10.0.0.0/8"
-test_net := assert m.network(m.cidr_parse("10.1.2.3/8")) = "10.0.0.0"
-test_bc := assert m.broadcast(m.cidr_parse("10.1.2.3/8")) = "10.255.255.255"
-test_ct := assert m.contains(m.cidr_parse("10.0.0.0/8"), m.parse("10.9.9.9")) = true
-test_ct2 := assert m.contains(m.cidr_parse("10.0.0.0/8"), m.parse("11.0.0.1")) = false
+test_parse := assert m.parse("192.168.1.1").address == "192.168.1.1"
+test_fmt := assert m.format(3232235777) == "192.168.1.1"
+test_rt := assert m.format(m.parse("10.0.0.1")) == "10.0.0.1"
+test_loop := assert m.is_loopback(m.parse("127.0.0.1")) == true
+test_priv := assert m.is_private(m.parse("10.1.2.3")) == true
+test_priv2 := assert m.is_private(m.parse("8.8.8.8")) == false
+test_unspec := assert m.is_unspecified(m.parse("0.0.0.0")) == true
+test_ll := assert m.is_link_local(m.parse("169.254.0.1")) == true
+test_mc := assert m.is_multicast(m.parse("224.0.0.1")) == true
+test_cp := assert m.cidr_format(m.cidr_parse("10.0.0.0/8")) == "10.0.0.0/8"
+test_net := assert m.network(m.cidr_parse("10.1.2.3/8")) == "10.0.0.0"
+test_bc := assert m.broadcast(m.cidr_parse("10.1.2.3/8")) == "10.255.255.255"
+test_ct := assert m.contains(m.cidr_parse("10.0.0.0/8"), m.parse("10.9.9.9")) == true
+test_ct2 := assert m.contains(m.cidr_parse("10.0.0.0/8"), m.parse("11.0.0.1")) == false
