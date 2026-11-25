@@ -16,8 +16,8 @@
 
 ## Contract
 
-- Interface lives in `.hnl`; the native backend is `lib-ip-c`
-  (`ip-c` module) — this repo declares the `ip.*`/`ip.cidr.*`/
+- Interface lives in `.hnl`; the native backend is `lib-ip-native`
+  (`ip-native` module) — this repo declares the `ip.*`/`ip.cidr.*`/
   `ip.socket.*` surface.
 - Pure `.hnl`, no Rust crate in this repo.
 
