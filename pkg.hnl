@@ -1,1 +1,1 @@
-{ modules: ["ip"], description: "IP address, CIDR, and socket primitives.", license: "MIT" }
+{ modules: ["ip"], name: "ip", description: "IP address, CIDR, and socket primitives.", license: "MIT" }
